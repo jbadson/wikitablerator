@@ -10,14 +10,21 @@ import argparse
 parser = argparse.ArgumentParser(description="Converts a table from comma-separated values " +
     "(csv) to MediaWiki-compatible markup. Prints result to stdout.")
 parser.add_argument("file", help="CSV file to convert")
+parser.add_argument("-H", "--header", help="Treat first line as column labels (make text bold).",
+    action="store_true")
 
 def dump_wikitable(csv_string):
     csvtable = csv_string.split('\n')
     newtable = '{| class="wikitable"\n'
+    firstrow = True
     for row in csvtable:
         for cell in row.split(','): #XXX How does csv escape commas in cells?
-            newtable = newtable + "|%s\n" %cell
+            if firstrow:
+                newtable = newtable + "!%s\n" %cell
+            else:
+                newtable = newtable + "|%s\n" %cell
         newtable = newtable + "|-\n"
+        firstrow = False
     newtable = newtable + "|}"
     return newtable
 
